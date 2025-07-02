@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Albion Online Profit Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1rem;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .calculator-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.95rem;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        input[type="number"], input[type="text"] {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e1e8ed;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        .multiplier-input {
+            width: 100px !important;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .results-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #dee2e6;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #dee2e6;
+            font-size: 1.1rem;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .result-value {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .profit-positive {
+            color: #28a745;
+        }
+
+        .profit-negative {
+            color: #dc3545;
+        }
+
+        .margin-display {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .margin-negative {
+            background: linear-gradient(135deg, #dc3545, #e74c3c);
+        }
+
+        .fees-section {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .fees-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .fee-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            color: #856404;
+        }
+
+        .logs-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .logs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .clear-logs-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .clear-logs-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .log-entry {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 0 10px 10px 0;
+            font-size: 0.9rem;
+        }
+
+        .log-timestamp {
+            color: #6c757d;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+
+        .log-details {
+            color: #495057;
+        }
+
+        .calculate-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .input-row {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .multiplier-input {
+                width: 100% !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚔️ Albion Online Profit Calculator</h1>
+            <p>Calculate your profit margins with precision and track your trading history</p>
+        </div>
+
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="calculator-section">
+                    <div class="section-title">💰 Trading Calculator</div>
+                    
+                    <div class="input-group">
+                        <label>Item Name</label>
+                        <input type="text" id="itemName" placeholder="e.g., Silver, T8 Sword" value="Silver">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Quantity</label>
+                        <input type="number" id="quantity" placeholder="Enter quantity" value="1000" min="1">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Buy Order Price (per unit)</label>
+                        <input type="number" id="buyPrice" placeholder="0.00" step="0.01" min="0">
+                    </div>
+
+                    <div class="input-group">
+                        <label>Sell Order Price (per unit)</label>
+                        <input type="number" id="sellPrice" placeholder="0.00" step="0.01" min="0">
+                    </div>
+
+                    <div class="fees-section">
+                        <div class="fees-title">📊 Trading Fees Configuration</div>
+                        
+                        <div class="input-group">
+                            <label>Setup Fee (%)</label>
+                            <input type="number" id="setupFee" value="2.5" step="0.1" min="0" max="100">
+                        </div>
+
+                        <div class="input-group">
+                            <label>Sell Tax (%)</label>
+                            <input type="number" id="sellTax" value="8.0" step="0.1" min="0" max="100">
+                        </div>
+                    </div>
+
+                    <button class="calculate-btn" onclick="calculateProfit()">
+                        🔢 Calculate Profit & Log Result
+                    </button>
+                </div>
+
+                <div class="results-section">
+                    <div class="section-title">📈 Results</div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Total Buy Cost:</span>
+                        <span class="result-value" id="totalBuyCost">$0.00</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Total Sell Revenue:</span>
+                        <span class="result-value" id="totalSellRevenue">$0.00</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Setup Fee:</span>
+                        <span class="result-value" id="setupFeeAmount">$0.00</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Sell Tax:</span>
+                        <span class="result-value" id="sellTaxAmount">$0.00</span>
+                    </div>
+                    
+                    <div class="result-item">
+                        <span class="result-label">Total Fees:</span>
+                        <span class="result-value" id="totalFees">$0.00</span>
+                    </div>
+                    
+                    <div class="result-item" style="border-top: 2px solid #dee2e6; padding-top: 15px; margin-top: 10px;">
+                        <span class="result-label" style="font-size: 1.2rem;">Net Profit:</span>
+                        <span class="result-value" id="netProfit" style="font-size: 1.4rem;">$0.00</span>
+                    </div>
+
+                    <div class="margin-display" id="marginDisplay">
+                        <div style="font-size: 0.9rem; opacity: 0.9;">Profit Margin</div>
+                        <div style="font-size: 1.8rem; font-weight: bold;" id="profitMargin">0.00%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="logs-section">
+                <div class="logs-header">
+                    <div class="section-title" style="margin: 0;">📋 Trading Logs</div>
+                    <button class="clear-logs-btn" onclick="clearLogs()">🗑️ Clear Logs</button>
+                </div>
+                
+                <div id="logsContainer">
+                    <div style="text-align: center; color: #6c757d; padding: 20px;">
+                        No calculations yet. Start trading to see your history!
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tradingLogs = [];
+
+        function calculateProfit() {
+            // Get input values
+            const itemName = document.getElementById('itemName').value || 'Unknown Item';
+            const quantity = parseFloat(document.getElementById('quantity').value) || 0;
+            const buyPrice = parseFloat(document.getElementById('buyPrice').value) || 0;
+            const sellPrice = parseFloat(document.getElementById('sellPrice').value) || 0;
+            const setupFeePercent = parseFloat(document.getElementById('setupFee').value) || 0;
+            const sellTaxPercent = parseFloat(document.getElementById('sellTax').value) || 0;
+
+            // Calculate costs and revenues
+            const totalBuyCost = quantity * buyPrice;
+            const totalSellRevenue = quantity * sellPrice;
+
+            // Calculate fees
+            const setupFeeAmount = totalBuyCost * (setupFeePercent / 100);
+            const sellTaxAmount = totalSellRevenue * (sellTaxPercent / 100);
+            const totalFees = setupFeeAmount + sellTaxAmount;
+
+            // Calculate profit
+            const netProfit = totalSellRevenue - totalBuyCost - totalFees;
+            const profitMargin = totalBuyCost > 0 ? (netProfit / totalBuyCost) * 100 : 0;
+
+            // Update display
+            updateResults({
+                totalBuyCost,
+                totalSellRevenue,
+                setupFeeAmount,
+                sellTaxAmount,
+                totalFees,
+                netProfit,
+                profitMargin
+            });
+
+            // Log the calculation
+            logCalculation({
+                itemName,
+                quantity,
+                buyPrice,
+                sellPrice,
+                setupFeePercent,
+                sellTaxPercent,
+                totalBuyCost,
+                totalSellRevenue,
+                totalFees,
+                netProfit,
+                profitMargin,
+                timestamp: new Date()
+            });
+        }
+
+        function updateResults(results) {
+            document.getElementById('totalBuyCost').textContent = formatCurrency(results.totalBuyCost);
+            document.getElementById('totalSellRevenue').textContent = formatCurrency(results.totalSellRevenue);
+            document.getElementById('setupFeeAmount').textContent = formatCurrency(results.setupFeeAmount);
+            document.getElementById('sellTaxAmount').textContent = formatCurrency(results.sellTaxAmount);
+            document.getElementById('totalFees').textContent = formatCurrency(results.totalFees);
+            
+            const profitElement = document.getElementById('netProfit');
+            profitElement.textContent = formatCurrency(results.netProfit);
+            profitElement.className = 'result-value ' + (results.netProfit >= 0 ? 'profit-positive' : 'profit-negative');
+            
+            const marginElement = document.getElementById('profitMargin');
+            const marginDisplay = document.getElementById('marginDisplay');
+            marginElement.textContent = results.profitMargin.toFixed(2) + '%';
+            
+            if (results.profitMargin >= 0) {
+                marginDisplay.className = 'margin-display';
+            } else {
+                marginDisplay.className = 'margin-display margin-negative';
+            }
+        }
+
+        function logCalculation(data) {
+            tradingLogs.unshift(data);
+            
+            // Keep only last 50 logs
+            if (tradingLogs.length > 50) {
+                tradingLogs = tradingLogs.slice(0, 50);
+            }
+            
+            updateLogsDisplay();
+        }
+
+        function updateLogsDisplay() {
+            const container = document.getElementById('logsContainer');
+            
+            if (tradingLogs.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; color: #6c757d; padding: 20px;">
+                        No calculations yet. Start trading to see your history!
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = tradingLogs.map(log => `
+                <div class="log-entry">
+                    <div class="log-timestamp">
+                        ${log.timestamp.toLocaleString()}
+                    </div>
+                    <div class="log-details">
+                        <strong>${log.itemName}</strong><br>
+                        Qty: ${log.quantity.toLocaleString()} × ${log.multiplier} = ${log.totalQuantity.toLocaleString()}<br>
+                        Buy: ${formatCurrency(log.buyPrice)}/unit → Total: ${formatCurrency(log.totalBuyCost)}<br>
+                        Sell: ${formatCurrency(log.sellPrice)}/unit → Total: ${formatCurrency(log.totalSellRevenue)}<br>
+                        Fees: ${formatCurrency(log.totalFees)} (${log.setupFeePercent}% + ${log.sellTaxPercent}%)<br>
+                        <strong style="color: ${log.netProfit >= 0 ? '#28a745' : '#dc3545'};">
+                            Net Profit: ${formatCurrency(log.netProfit)} (${log.profitMargin.toFixed(2)}%)
+                        </strong>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function clearLogs() {
+            if (confirm('Are you sure you want to clear all trading logs?')) {
+                tradingLogs = [];
+                updateLogsDisplay();
+            }
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(amount);
+        }
+
+        // Auto-calculate on input change
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = ['quantity', 'multiplier', 'buyPrice', 'sellPrice', 'setupFee', 'sellTax'];
+            inputs.forEach(id => {
+                document.getElementById(id).addEventListener('input', calculateProfit);
+            });
+            
+            // Initial calculation with default values
+            calculateProfit();
+        });
+    </script>
+</body>
+</html>
